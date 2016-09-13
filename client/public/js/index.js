@@ -2,8 +2,8 @@
 
 function initMap() {
   var map = new google.maps.Map(document.getElementById('map'), {
-    center: { lat: -34.397, lng: 150.644 },
-    zoom: 16
+    center: { lat: 35.6786466953, lng: 139.7673965155 },
+    zoom: 20
   });
   var infoWindow = new google.maps.InfoWindow({ map: map });
 
@@ -47,7 +47,6 @@ function initMap() {
                 content: '<div>\n                      <a href="' + shop.urls.pc + '">\n                        <img src="' + shop.photo.mobile.s + '">\n                      </a>\n                    </div>',
                 position: { lat: +shop.lat, lng: +shop.lng }
               });
-              console.log({ lat: shop.lat, lng: shop.lng });
               infoWindows[key].open(map);
             });
           });
