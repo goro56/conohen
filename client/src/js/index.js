@@ -19,6 +19,15 @@ function initMap() {
       })
     );
   }
+  infoWindows.push(
+    new google.maps.InfoWindow({
+      content: '<a href="http://www.recruit.jp/"><img src="https://lh3.googleusercontent.com/gyTZjgdvHrgLtU0kIlTmSQdjMLUYeJtC3n0MbxxjDWJn4AITzOHEUFY173FIWFJRHs4" width="70" height="70"></a>',
+      disableAutoPan: true,
+      position: { lat: 35.6786758, lng: 139.7675861 },
+    })
+  );
+  infoWindows[infoWindows.length - 1].open(map);
+
 
   $('#move').on('click', () => {
     move = move ? false : true;
