@@ -65,13 +65,24 @@ function initMap() {
     handleLocationError(false, infoWindow, map.getCenter());
   }
 
-  $('#plus').on('click', function () {
+  var reader = new FileReader();
+  reader.addEventListener('load', function () {
     infoWindows.push(new google.maps.InfoWindow({
-      content: 'added marker!!!',
+      content: '<img src="' + reader.result + '" width="70" height="70">',
       position: pos
     }));
     infoWindows[infoWindows.length - 1].open(map);
-    console.log('add!!!');
+  });
+
+  $('#file').change(function (e) {
+    if (e.target.files[0].type.match(/image/)) {
+      reader.readAsDataURL(e.target.files[0]);
+    }
+    $('#bottom-left').css('display', 'none');
+  });
+
+  $('#plus').on('click', function () {
+    $('#bottom-left').css('display', 'block');
   });
 }
 
