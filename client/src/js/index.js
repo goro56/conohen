@@ -1,20 +1,23 @@
 function initMap() {
   const map = new google.maps.Map(document.getElementById('map'), {
     center: { lat: -34.397, lng: 150.644 },
-    zoom: 13
+    zoom: 16,
   });
   const infoWindow = new google.maps.InfoWindow({ map: map });
 
   // Try HTML5 geolocation.
   let pos;
   let marker;
-  const infoWindows = new Array(10);
+  const infoWindows = [];
 
-  infoWindows.map((iw) => {
-    iw = new google.maps.InfoWindow({
-      content: '',
-    });
-  });
+  for(let i=0; i<10; i++){
+    infoWindows.push(
+      new google.maps.InfoWindow({
+        content: '',
+        disableAutoPan: true,
+      })
+    );
+  }
 
   let atFirst = true;
   if (navigator.geolocation) {
@@ -30,25 +33,34 @@ function initMap() {
           map: map,
           title: 'Here!'
         });
-        
+
         setInterval(() => {
           marker.setPosition(pos);
           map.setCenter(pos);
-          $.ajax({
-            url: "http://127.0.0.1:5000/hot_pepper",
-            data: `lat=${pos.lat}&lng=${pos.lng}&range=1`,
-            dataType: 'json',
-            success: (dataset) => {
+          $.getJSON(
+            "https://afternoon-caverns-24273.herokuapp.com/hot_pepper",
+            {
+              lat: pos.lat,
+              lng: pos.lng,
+              range: 1
+            },
+            (dataset) => {
               dataset.results.shop.map((shop, key) => {
-                infoWindows[key].setAttribute({
-                  content: `<div><h2>${shop.name}</h2></div>`,
-                  pos: { lat: shop.lat, lng: shop.lng },
+                infoWindows[key].setOptions({
+                  content:
+                    `<div>
+                      <a href="${shop.urls.pc}">
+                        <img src="${shop.photo.mobile.s}">
+                      </a>
+                    </div>`,
+                  position: { lat: +shop.lat, lng: +shop.lng },
                 });
+                console.log({ lat: shop.lat, lng: shop.lng });
                 infoWindows[key].open(map);
               })
             }
-          })
-        }, 1000);
+          )
+        }, 10000);
         atFirst = false;
       }
     }, () => handleLocationError(true, infoWindow, map.getCenter()), {
@@ -60,9 +72,23 @@ function initMap() {
     // Browser doesn't support Geolocation
     handleLocationError(false, infoWindow, map.getCenter());
   }
+
+  $('#plus').on('click', () => {
+    infoWindows.push(
+      new google.maps.InfoWindow({
+        content: 'added marker!!!',
+        position: pos,
+      })
+    );
+    infoWindows[infoWindows.length - 1].open(map);
+    console.log('add!!!');
+  });
 }
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
   infoWindow.setPosition(pos);
-  infoWindow.setContent(browserHasGeolocation ? 'Error: The Geolocation service failed.' : 'Error: Your browser doesn\'t support geolocation.');
+  infoWindow.setContent(browserHasGeolocation ?
+    'Error: The Geolocation service failed.' :
+    'Error: Your browser doesn\'t support geolocation.'
+  );
 }

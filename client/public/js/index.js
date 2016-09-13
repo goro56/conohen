@@ -3,20 +3,21 @@
 function initMap() {
   var map = new google.maps.Map(document.getElementById('map'), {
     center: { lat: -34.397, lng: 150.644 },
-    zoom: 13
+    zoom: 16
   });
   var infoWindow = new google.maps.InfoWindow({ map: map });
 
   // Try HTML5 geolocation.
   var pos = void 0;
   var marker = void 0;
-  var infoWindows = new Array(10);
+  var infoWindows = [];
 
-  infoWindows.map(function (iw) {
-    iw = new google.maps.InfoWindow({
-      content: ''
-    });
-  });
+  for (var i = 0; i < 10; i++) {
+    infoWindows.push(new google.maps.InfoWindow({
+      content: '',
+      disableAutoPan: true
+    }));
+  }
 
   var atFirst = true;
   if (navigator.geolocation) {
@@ -36,21 +37,21 @@ function initMap() {
         setInterval(function () {
           marker.setPosition(pos);
           map.setCenter(pos);
-          $.ajax({
-            url: "http://127.0.0.1:5000/hot_pepper",
-            data: 'lat=' + pos.lat + '&lng=' + pos.lng + '&range=1',
-            dataType: 'json',
-            success: function success(dataset) {
-              dataset.results.shop.map(function (shop, key) {
-                infoWindows[key].setAttribute({
-                  content: '<div><h2>' + shop.name + '</h2></div>',
-                  pos: { lat: shop.lat, lng: shop.lng }
-                });
-                infoWindows[key].open(map);
+          $.getJSON("https://afternoon-caverns-24273.herokuapp.com/hot_pepper", {
+            lat: pos.lat,
+            lng: pos.lng,
+            range: 1
+          }, function (dataset) {
+            dataset.results.shop.map(function (shop, key) {
+              infoWindows[key].setOptions({
+                content: '<div>\n                      <a href="' + shop.urls.pc + '">\n                        <img src="' + shop.photo.mobile.s + '">\n                      </a>\n                    </div>',
+                position: { lat: +shop.lat, lng: +shop.lng }
               });
-            }
+              console.log({ lat: shop.lat, lng: shop.lng });
+              infoWindows[key].open(map);
+            });
           });
-        }, 1000);
+        }, 10000);
         atFirst = false;
       }
     }, function () {
@@ -64,6 +65,15 @@ function initMap() {
     // Browser doesn't support Geolocation
     handleLocationError(false, infoWindow, map.getCenter());
   }
+
+  $('#plus').on('click', function () {
+    infoWindows.push(new google.maps.InfoWindow({
+      content: 'added marker!!!',
+      position: pos
+    }));
+    infoWindows[infoWindows.length - 1].open(map);
+    console.log('add!!!');
+  });
 }
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
