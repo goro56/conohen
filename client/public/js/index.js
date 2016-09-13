@@ -10,6 +10,7 @@ function initMap() {
   // Try HTML5 geolocation.
   var pos = void 0;
   var marker = void 0;
+  var move = false;
   var infoWindows = [];
 
   for (var i = 0; i < 10; i++) {
@@ -19,13 +20,30 @@ function initMap() {
     }));
   }
 
+  $('#move').on('click', function () {
+    move = move ? false : true;
+    if (move) {
+      pos = {
+        lat: 35.658517,
+        lng: 139.70133399999997
+      };
+    }
+  });
+
   var atFirst = true;
   if (navigator.geolocation) {
     navigator.geolocation.watchPosition(function (position) {
-      pos = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      };
+      if (move) {
+        pos = {
+          lat: 35.658517,
+          lng: 139.70133399999997
+        };
+      } else {
+        pos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+      }
 
       if (atFirst) {
         marker = new google.maps.Marker({

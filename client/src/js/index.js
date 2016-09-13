@@ -8,6 +8,7 @@ function initMap() {
   // Try HTML5 geolocation.
   let pos;
   let marker;
+  let move = false;
   const infoWindows = [];
 
   for(let i=0; i<10; i++){
@@ -19,13 +20,30 @@ function initMap() {
     );
   }
 
+  $('#move').on('click', () => {
+    move = move ? false : true;
+    if (move) {
+      pos = {
+        lat: 35.658517,
+        lng: 139.70133399999997
+      };
+    }
+  });
+
   let atFirst = true;
   if (navigator.geolocation) {
     navigator.geolocation.watchPosition(position => {
-      pos = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      };
+      if (move) {
+        pos = {
+          lat: 35.658517,
+          lng: 139.70133399999997
+        };
+      } else {
+        pos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+      }
 
       if (atFirst) {
         marker = new google.maps.Marker({
